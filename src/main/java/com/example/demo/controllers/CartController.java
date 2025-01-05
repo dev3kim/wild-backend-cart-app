@@ -1,53 +1,30 @@
 package com.example.demo.controllers;
 
+import com.example.demo.application.CartService;
 import com.example.demo.controllers.dtos.CartDto;
-import com.example.demo.infrastructure.LineItemDAO;
-import com.example.demo.infrastructure.ProductDAO;
+import com.example.demo.models.Cart;
 import com.example.demo.models.LineItem;
-import com.example.demo.models.Product;
-import com.mongodb.client.MongoDatabase;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
-
 @RestController
 @RequestMapping("/cart")
 public class CartController {
-    private final MongoDatabase mongoDatabase;
+    private final CartService cartService;
 
-    private final LineItemDAO lineItemDAO;
-    private final ProductDAO productDAO;
-
-    public CartController(MongoDatabase mongoDatabase, LineItemDAO lineItemDAO, ProductDAO productDAO) {
-        this.mongoDatabase = mongoDatabase;
-        this.lineItemDAO = lineItemDAO;
-        this.productDAO = productDAO;
+    public CartController(CartService cartService) {
+        this.cartService = cartService;
     }
 
     @GetMapping
     CartDto detail() {
-        List<LineItem> lineItems = lineItemDAO.findAll();
+        Cart cart = cartService.getCart();
 
-        lineItems.forEach(lineItem -> {
-            String productId = lineItem.getProductId();
-            Product product = productDAO.find();
-
-            int unitPrice = product.getPrice();
-            int quantity = lineItem.getQuantity();
-
-            lineItem.setProductName(product.getName());
-            lineItem.setUnitPrice(product.getPrice());
-            lineItem.setTotalPrice(unitPrice * quantity);
-        });
-
-        int totalPrice = lineItems.stream()
-                .mapToInt(LineItem::getTotalPrice)
-                .sum();
-
-        return new CartDto(lineItems.stream()
-                .map(this::mapToDto).toList(), totalPrice);
+        return new CartDto(
+                cart.getLineItems().stream().map(this::mapToDto).toList(),
+                cart.getTotalPrice()
+        );
     }
 
     private CartDto.LineItemDto mapToDto(LineItem lineItem) {

@@ -21,7 +21,7 @@ public class Application {
 
     @Bean
     public MongoDatabase mongoDatabase(MongoClient mongoClient,
-                                       @Value("${mongobd.database}") String database) {
+                                       @Value("${mongodb}") String database) {
         return mongoClient.getDatabase(database);
     }
 }

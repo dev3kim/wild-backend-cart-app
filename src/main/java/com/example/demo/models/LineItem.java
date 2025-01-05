@@ -7,7 +7,11 @@ public class LineItem {
 
     private String productName;
     private int unitPrice;
-    private int totalPrice;
+
+    public LineItem(String productId, int quantity) {
+        this.productId = productId;
+        this.quantity = quantity;
+    }
 
     public LineItem(String id, String productId, int quantity) {
         this.id = id;
@@ -31,24 +35,21 @@ public class LineItem {
         return productName;
     }
 
-    public int getTotalPrice() {
-        return totalPrice;
-    }
-
     public int getUnitPrice() {
         return unitPrice;
     }
 
-    public void setUnitPrice(int unitPrice) {
-        this.unitPrice = unitPrice;
+    //domain logic
+    public void addQuantity(int quantity) {
+        this.quantity += quantity;
     }
 
-    public void setProductName(String name) {
-        this.productName = name;
+    public int getTotalPrice() {
+        return unitPrice * quantity;
     }
 
-    public void setTotalPrice(int totalPrice) {
-        this.totalPrice = totalPrice;
+    public void setProduct(Product product) {
+        this.productName = product.getName();
+        this.unitPrice = product.getPrice();
     }
-
 }
